@@ -1,4 +1,9 @@
+# Misc
 .snakemake/
+.exclude
+Makefile
 notes.md
+
+# Data
 Data/
 Output/
