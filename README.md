@@ -1,4 +1,4 @@
 
-module load snakemake Miniforge3
+# Omics predoc course 2024
 
-snakemake --workflow-profile Profiles/Slurm all_salmon
+

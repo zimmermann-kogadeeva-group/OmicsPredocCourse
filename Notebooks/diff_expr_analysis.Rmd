@@ -1,0 +1,239 @@
+---
+title: "DESeq2 analysis"
+author: "Bartosz Bartmanski"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(tximport)
+library(DESeq2)
+library(here)
+
+
+get_contrast <- function(strain, comp) {
+    return(c(
+        "group", 
+        paste0(strain, "_", str_sub(comp, 1, 1)), 
+        paste0(strain, "_", str_sub(comp, 4, 4))
+    ))
+}
+```
+
+## Load data
+
+First, we create a dataframe of files that need to be imported and 
+corresponding columns for strain id, condition, replicate, which we can get 
+from the file names.
+
+```{r}
+quant_files <- list.files(here("Output/Quants/"), recursive = T, pattern = "quant.sf", full.names=T)
+samples <- quant_files %>% dirname() %>% basename()
+
+df_samples <- data.frame(
+    row.names=samples, 
+    sample=samples, 
+    files=quant_files
+) %>%
+separate_wider_delim(
+    cols="sample", 
+    delim="_", 
+    names=c("strain", "condition", "replicate"), 
+    cols_remove=F
+)
+
+selected_strains <- df_samples %>% pull(strain) %>% unique()
+```
+
+Next, we use the tximport package to load the output from salmon for all samples
+in a format DESeq2 expects:
+
+```{r pressure, echo=FALSE}
+# Read in the annotation file
+tx2gene <- read_tsv(here("Data/annotation.tsv"), show_col_types=F) %>% 
+select(transcript_stable_id, gene_stable_id)
+
+# Create metadata table
+meta <- df_samples %>%
+mutate(group=factor(paste(strain, condition, sep="_"))) %>%
+select(sample, condition, group) %>% 
+column_to_rownames(var="sample")
+
+# Import all the salmon outputs
+txi <- tximport(
+    df_samples[["files"]], 
+    type="salmon", 
+    tx2gene=tx2gene, 
+    countsFromAbundance="lengthScaledTPM"
+)
+```
+## Running DESeq2
+
+```{r}
+# Run DESeq2 
+dds <- DESeqDataSetFromTximport(txi, colData = meta, design = ~ group)
+dds <- DESeq(dds)
+
+# and save to rds
+dir.create(here("Output/DESeq2/"), showWarnings = F)
+saveRDS(dds, here("Output/DESeq2/dds.rds"))
+```
+
+```{r}
+# Get raw counts and save to csv
+df_counts <- dds %>%
+counts() %>% 
+as.data.frame() %>% 
+rownames_to_column(var="gene_id")
+
+# Get normalised counts and save to csv
+df_norm <- dds %>%
+counts(normalized=TRUE) %>% 
+as.data.frame() %>% 
+rownames_to_column(var="gene_id")
+
+# Get variance stabilising transformation of counts
+df_rlog <- dds %>% 
+rlog() %>% 
+assay() %>% 
+as.data.frame() %>%
+rownames_to_column(var="gene_id")
+
+# Get variance stabilising transformation of counts
+df_vst <- dds %>% 
+vst() %>% 
+assay() %>% 
+as.data.frame() %>%
+rownames_to_column(var="gene_id")
+```
+Finally, we get the log fold changes and p-values for each comparison:
+
+```{r}
+df_lfc <- expand_grid(
+    strain=selected_strains, 
+    comparison=c("MvsP", "CvsP", "CvsM")
+) %>% 
+# filter(!(strain == "090.3" & str_detect(comparison, "M"))) %>%
+rowwise() %>%
+mutate(both = list(c_across(everything()))) %>%
+pull(both) %>%
+map(
+    ~{
+        results(dds, contrast=get_contrast(.x[[1]], .x[[2]])) %>%
+        as.data.frame() %>%
+        rownames_to_column(var="gene_id") %>%
+        mutate(strain=.x[[1]], comparison=.x[[2]])
+    }
+) %>%
+bind_rows() %>%
+dplyr::rename(log2fc=log2FoldChange) %>%
+mutate(regulation = case_when(padj < 0.05 & log2fc > 1 ~ "Up",
+                              padj < 0.05 & log2fc < -1 ~ "Down",
+                              TRUE ~ "None"))
+
+df_lfc %>% write_csv(here("Output/DESeq2/dds_results.csv"))
+```
+
+## Plotting results
+
+```{r}
+volcano_plot <- function(data, pval=0.05, lfcval=1, col="padj") {
+    ggplot(data=data, 
+           aes(x=log2fc, y=-log10(!!sym(col)), col=regulation, gene_id=gene_id)) +
+        geom_point(size=0.5) + 
+        scale_color_manual(values=c("Up"="red", "Down"="blue", "None"="black")) +
+        geom_hline(yintercept=-log10(pval), linetype='dashed', color="red") + 
+        geom_vline(xintercept=-lfcval, linetype='dashed', color="red") +
+        geom_vline(xintercept=lfcval, linetype='dashed', color="red") %>%
+    return()
+}
+```
+
+Volcano plot for strain 083.2 comparing M treatment and parental strain:
+
+```{r}
+df_lfc %>%
+filter(strain == "083.2" & comparison == "MvsP") %>%
+volcano_plot()  # %>% plotly::ggplotly()
+```
+All volcano plots:
+
+```{r}
+df_lfc %>%
+volcano_plot() +
+facet_grid(col=vars(strain), row=vars(comparison)) 
+```
+Number of significantly up- or down-regulated genes:
+
+```{r}
+df_lfc %>%
+filter(regulation != "None") %>% 
+dplyr::count(strain, comparison, regulation) %>%
+ggplot(aes(x=strain, y=n, fill = regulation)) +
+    geom_bar(stat="identity", position="dodge", width=0.5) +
+    scale_fill_manual(values=c("blue", "red")) +
+    facet_grid(rows=vars(comparison))
+```
+
+## Enrichment
+
+
+
+## Genes in common between strains
+
+Number of genes, that are significantly up- or down-regulated that are common 
+between strains:
+
+```{r}
+df_num_strains <- df_lfc %>% 
+filter(padj < 0.05 & abs(log2fc) > 1) %>%
+group_by(comparison, gene_id) %>%
+summarise(num_strains=n_distinct(strain)) %>%
+ungroup() %>%
+group_by(num_strains, comparison) %>%
+summarise(num_genes=n_distinct(gene_id)) %>% 
+ungroup()
+
+df_num_strains %>%
+ggplot(aes(x=num_strains, y=num_genes, fill=comparison)) +
+    geom_bar(stat="identity", position="dodge", width=0.5)
+```
+
+
+## PCA
+
+```{r}
+pca <- df_vst %>% 
+column_to_rownames(var="gene_id") %>% 
+t() %>%
+prcomp(retx=T, rank.=2)
+
+df_pca <- pca[["x"]] %>% 
+as.data.frame() %>%
+rownames_to_column(var="group") %>%
+tidyr::separate(group, into=c("strain", "condition", "replicate"), sep="_")
+
+summary(pca)
+```
+
+```{r}
+var_expl <- summary(pca)$importance[2, c(1, 2)]
+
+df_pca %>%
+ggplot(mapping=aes(x=PC1, y=PC2, color=strain, shape=condition)) + 
+    geom_point(size=2) + 
+    labs(
+        x=paste0("PC1 (", var_expl["PC1"]*100, "%)"),
+        y=paste0("PC2 (", var_expl["PC2"]*100, "%)")
+    )
+```
+
+## MIC
+
+```{r}
+df_mic <- read_csv(here("Data/mic.csv"))
+```
+

@@ -1,0 +1,4 @@
+Data/*.tsv filter=lfs diff=lfs merge=lfs -text
+Data/*.fasta filter=lfs diff=lfs merge=lfs -text
+Data/*.csv filter=lfs diff=lfs merge=lfs -text
+Data/*.fa.gz filter=lfs diff=lfs merge=lfs -text

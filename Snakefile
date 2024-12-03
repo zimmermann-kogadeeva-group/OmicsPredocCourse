@@ -5,14 +5,18 @@ configfile: "config.json"
 
 rule all:
     input:
-        quant_files = expand(
+        qc="Output/QC/multiqc_report.html",
+        quants=expand(
             "Output/Quants/{f}/quant.sf", f=config["transcriptomics"]
         )
-        "Output/QC/multiqc_report.html",
+
+rule all_salmon:
+    input:
+        rules.all.input["quants"]
 
 rule fastqc:
     input:
-        "Data/Transcriptomics/Raw/{filename}.fastq.gz"
+        "Data/Transcriptomics/{filename}.fastq.gz"
     output:
         "Output/QC/{filename}_fastqc.html"
     conda:
