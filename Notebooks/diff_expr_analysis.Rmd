@@ -2,7 +2,7 @@
 title: "DESeq2 analysis"
 author: "Bartosz Bartmanski"
 date: "`r Sys.Date()`"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -77,12 +77,6 @@ txi <- tximport(
 dds <- DESeqDataSetFromTximport(txi, colData = meta, design = ~ group)
 dds <- DESeq(dds)
 
-# and save to rds
-dir.create(here("Output/DESeq2/"), showWarnings = F)
-saveRDS(dds, here("Output/DESeq2/dds.rds"))
-```
-
-```{r}
 # Get raw counts and save to csv
 df_counts <- dds %>%
 counts() %>% 
@@ -95,20 +89,11 @@ counts(normalized=TRUE) %>%
 as.data.frame() %>% 
 rownames_to_column(var="gene_id")
 
-# Get variance stabilising transformation of counts
-df_rlog <- dds %>% 
-rlog() %>% 
-assay() %>% 
-as.data.frame() %>%
-rownames_to_column(var="gene_id")
-
-# Get variance stabilising transformation of counts
-df_vst <- dds %>% 
-vst() %>% 
-assay() %>% 
-as.data.frame() %>%
-rownames_to_column(var="gene_id")
+# and save to rds
+dir.create(here("Output/DESeq2/"), showWarnings = F)
+saveRDS(dds, here("Output/DESeq2/dds.rds"))
 ```
+
 Finally, we get the log fold changes and p-values for each comparison:
 
 ```{r}
@@ -178,10 +163,6 @@ ggplot(aes(x=strain, y=n, fill = regulation)) +
     facet_grid(rows=vars(comparison))
 ```
 
-## Enrichment
-
-
-
 ## Genes in common between strains
 
 Number of genes, that are significantly up- or down-regulated that are common 
@@ -206,6 +187,13 @@ ggplot(aes(x=num_strains, y=num_genes, fill=comparison)) +
 ## PCA
 
 ```{r}
+# Get variance stabilising transformation of counts
+df_vst <- dds %>% 
+vst() %>% 
+assay() %>% 
+as.data.frame() %>%
+rownames_to_column(var="gene_id")
+
 pca <- df_vst %>% 
 column_to_rownames(var="gene_id") %>% 
 t() %>%
@@ -217,13 +205,13 @@ rownames_to_column(var="group") %>%
 tidyr::separate(group, into=c("strain", "condition", "replicate"), sep="_")
 
 summary(pca)
+
+var_expl <- summary(pca)$importance[2, c(1, 2)]
 ```
 
 ```{r}
-var_expl <- summary(pca)$importance[2, c(1, 2)]
-
 df_pca %>%
-ggplot(mapping=aes(x=PC1, y=PC2, color=strain, shape=condition)) + 
+ggplot(mapping=aes(x=PC1, y=PC2)) + 
     geom_point(size=2) + 
     labs(
         x=paste0("PC1 (", var_expl["PC1"]*100, "%)"),
@@ -231,9 +219,16 @@ ggplot(mapping=aes(x=PC1, y=PC2, color=strain, shape=condition)) +
     )
 ```
 
-## MIC
+**Task**: try adding strain, condition or MIC information into the plot to see 
+any clustering.
+
+The MIC table is loaded below:
 
 ```{r}
-df_mic <- read_csv(here("Data/mic.csv"))
+df_mic <- read_csv(here("Data/mic.csv")) %>%
+mutate(
+    cza_mic_level=ifelse(cza_mic > 8, "high", "low"), 
+    mem_mic_level=ifelse(mem_mic > 8, "high", "low")
+)
 ```
 
