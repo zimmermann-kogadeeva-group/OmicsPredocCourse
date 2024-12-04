@@ -54,12 +54,12 @@ in a format DESeq2 expects:
 ```{r pressure, echo=FALSE}
 # Read in the annotation file
 tx2gene <- read_tsv(here("Data/annotation.tsv"), show_col_types=F) %>% 
-select(transcript_stable_id, gene_stable_id)
+dplyr::select(transcript_stable_id, gene_stable_id)
 
 # Create metadata table
 meta <- df_samples %>%
 mutate(group=factor(paste(strain, condition, sep="_"))) %>%
-select(sample, condition, group) %>% 
+dplyr::select(sample, condition, group) %>% 
 column_to_rownames(var="sample")
 
 # Import all the salmon outputs
@@ -91,7 +91,9 @@ rownames_to_column(var="gene_id")
 
 # and save to rds
 dir.create(here("Output/DESeq2/"), showWarnings = F)
-saveRDS(dds, here("Output/DESeq2/dds.rds"))
+df_counts %>% write_csv(here("Output/DESeq2/counts.csv"))
+df_norm %>% write_csv(here("Output/DESeq2/normalised_counts.csv"))
+dds %>% saveRDS(here("Output/DESeq2/dds.rds"))
 ```
 
 Finally, we get the log fold changes and p-values for each comparison:
@@ -155,7 +157,7 @@ Number of significantly up- or down-regulated genes:
 
 ```{r}
 df_lfc %>%
-filter(regulation != "None") %>% 
+filter(regulation != "None") %>%
 dplyr::count(strain, comparison, regulation) %>%
 ggplot(aes(x=strain, y=n, fill = regulation)) +
     geom_bar(stat="identity", position="dodge", width=0.5) +
@@ -179,6 +181,7 @@ summarise(num_genes=n_distinct(gene_id)) %>%
 ungroup()
 
 df_num_strains %>%
+mutate(num_strains = as.factor(num_strains)) %>%
 ggplot(aes(x=num_strains, y=num_genes, fill=comparison)) +
     geom_bar(stat="identity", position="dodge", width=0.5)
 ```
@@ -231,4 +234,32 @@ mutate(
     mem_mic_level=ifelse(mem_mic > 8, "high", "low")
 )
 ```
+
+## Enrichment
+
+```{r}
+source("enrichment.R")
+
+df_go_terms <- df_lfc %>% 
+filter(padj < 0.05 & abs(log2fc) > 1) %>%
+group_by(comparison, strain) %>%
+group_map(~{
+    .x %>%
+    pull(gene_id) %>%
+    paste0(collapse=",") %>%
+    get_ora() %>%
+    mutate(comparison = .y$comparison, strain = .y$strain)
+}) %>%
+bind_rows() %>%
+mutate(term=paste0(label, " (", id, ")"))
+```
+
+```{r}
+df_go_terms %>%
+filter(strain == "090.3", comparison == "CvsP", fdr < 0.01) %>%
+arrange(fdr) %>%
+ggplot(aes(y=term, x=number_in_list, fill=fdr)) + 
+    geom_bar(stat = "identity")
+```
+
 

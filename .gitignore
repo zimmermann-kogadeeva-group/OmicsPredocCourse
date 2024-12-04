@@ -1,10 +1,17 @@
 # Misc
 .snakemake/
 .exclude
+.envrc
+.jupyter.log
+.ipynb_checkpoints/
+.go_terms_cache/
+Notebooks/.go_terms_cache*/
+__pycache__/
 Makefile
 notes.md
+.Rproj.user
+.Rhistory
 
 # Data
 Data/Transcriptomics/
 Output/
-.Rproj.user
