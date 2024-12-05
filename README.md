@@ -67,8 +67,14 @@ ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPre
 ### Running the transcriptomics pipeline
 
 As the pipeline takes a while (approx. an hour), we will first start running it
-before discussing what is happening in this pipeline. Run the following three
-commands to start the pipeline:
+before discussing what is happening in this pipeline. 
+
+To make sure the pipeline is not interrupted by internet issues we will use
+`tmux`, which you can start by running:
+```
+tmux
+```
+Within the tmux session, run the following three commands to start the pipeline:
 ```
 module load snakemake Miniforge3 &&
 cd ~/scratch/OmicsPredocCourse/ &&
@@ -79,8 +85,10 @@ we move on there, let's setup up our conda and R environments for later.
 
 ### Conda setup
 
-We setup the conda environment with the following two commands:
+Create a new tmux session by pressing `Ctrl+b c`. Then, in the new shell, we
+setup the conda environment with the following three commands:
 ```
+module load Miniforge3 &&
 eval "$(conda shell.bash hook)" &&
 conda create -n omics_predoc_course -c bioconda -c conda-forge python==3.11 jupyterlab ipympl pandas requests scikit-learn seaborn matplotlib diskcache
 ```
