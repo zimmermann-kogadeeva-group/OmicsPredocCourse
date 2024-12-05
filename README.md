@@ -66,8 +66,8 @@ ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPre
 
 ### Running the transcriptomics pipeline
 
-As the pipeline takes a while (approx. an hour), we will first start running it
-before discussing what is happening in this pipeline. 
+In the interest of time, we will first start running the pipeline before
+discussing it.
 
 To make sure the pipeline is not interrupted by internet issues we will use
 `tmux`, which you can start by running:

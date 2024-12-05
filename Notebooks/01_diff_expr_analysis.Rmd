@@ -5,6 +5,8 @@ date: "`r Sys.Date()`"
 output: github_document
 ---
 
+In this notebook, we will use `DESeq2` to analyse the transcriptomics data. 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -222,8 +224,9 @@ ggplot(mapping=aes(x=PC1, y=PC2)) +
     )
 ```
 
-**Task**: try adding strain, condition or MIC information into the plot to see 
-any clustering.
+**Task**: 
+- try adding strain, condition or MIC information into the plot to see any clustering.
+- what conclusions can you draw from all the plots in this notebook?
 
 The MIC table is loaded below:
 
@@ -234,3 +237,5 @@ mutate(
     mem_mic_level=ifelse(mem_mic > 8, "high", "low")
 )
 ```
+
+Next, we move on to enrichment analysis in notebook [02_enrichment](02_enrichment.ipynb).
