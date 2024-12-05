@@ -11,6 +11,7 @@ Makefile
 notes.md
 .Rproj.user
 .Rhistory
+*.swp
 
 # Data
 Data/Transcriptomics/

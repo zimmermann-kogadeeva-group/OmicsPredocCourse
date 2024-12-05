@@ -36,7 +36,11 @@ The schematic diagram of the experimental setup
 
 ## Setup
 
-First, access the one of the login nodes on the cluster using ssh. 
+First, access the one of the login nodes on the cluster using ssh. On
+MacOS/linux open terminal and on Windows open powershell or WSL and run 
+```
+ssh <your_embl_username>@login1.cluster.embl.de
+```
 
 On the login node run the following to use the tools needed for this practical:
 ```
@@ -52,6 +56,26 @@ Then clone the git repository:
 ```
 git clone https://git.embl.de/grp-zimmermann-kogadeeva/OmicsPredocCourse.git
 ```
+
+The raw transcriptomics reads can be found on the cluster at
+`/scratch/omics_predoc_course/Data/Transcriptomics`. Use the following command
+to access this data from your folder:
+```
+ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPredocCourse/Data/Transcriptomics
+```
+
+### Running the transcriptomics pipeline
+
+As the pipeline takes a while (approx. an hour), we will first start running it
+before discussing what is happening in this pipeline. Run the following three
+commands to start the pipeline:
+```
+module load snakemake Miniforge3 &&
+cd ~/scratch/OmicsPredocCourse/ &&
+snakemake --workflow-profile Profiles/Slurm all_salmon
+```
+The pipeline will be discussed in [here](Notebooks/00_pipeline.md). But before
+we move on there, let's setup up our conda and R environments for later.
 
 ### Conda setup
 
@@ -87,25 +111,7 @@ renv::install("bioc::DESeq2")
 renv::install("here")
 ```
 
-### Data
-
-The raw transcriptomics reads can be found on the cluster at
-`/scratch/omics_predoc_course/Data/Transcriptomics`. Use the following command
-to access this data from your folder:
-```
-ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPredocCourse/Data/Transcriptomics
-```
-
-## Running the transcriptomics pipeline
-
-Go into the project folder and run snakemake pipeline:
-```
-module load snakemake Miniforge3
-cd ~/scratch/OmicsPredocCourse/
-snakemake --workflow-profile Profiles/Slurm
-```
-
 **Note: you can switch between rstudio and jupyter-lab on jupyterhub.embl.de by
 going to <https://jupyterhub.embl.de/hub/home>.**
 
-
+Now, let's move on to description of the [pipeline](Notebooks/00_pipeline).
