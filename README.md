@@ -122,4 +122,4 @@ renv::install("here")
 **Note: you can switch between rstudio and jupyter-lab on jupyterhub.embl.de by
 going to <https://jupyterhub.embl.de/hub/home>.**
 
-Now, let's move on to description of the [here](Notebooks/00_pipeline.md).
+Now, let's move on to description of the pipeline [here](Notebooks/00_pipeline.md).
