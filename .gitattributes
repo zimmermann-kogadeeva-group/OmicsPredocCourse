@@ -7,3 +7,4 @@ Data/Proteomics/raw.csv filter=lfs diff=lfs merge=lfs -text
 Data/Proteomics/lfc.csv filter=lfs diff=lfs merge=lfs -text
 Data/Proteomics/normalised.csv filter=lfs diff=lfs merge=lfs -text
 Data/*.gz filter=lfs diff=lfs merge=lfs -text
+*.svg filter=lfs diff=lfs merge=lfs -text

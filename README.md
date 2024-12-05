@@ -1,6 +1,39 @@
 
 # Omics predoc course 2024
 
+Welcome to the omics practical! 
+
+Below you will find the background information on the project which this
+practical is based on.
+
+## Background
+
+Collaboration with Dr. Baharak Babouee Flury, MD, Infectiologist from
+Kantonsspital St. Gallen, Switzerland.
+
+**Goal**: Investigate potential mechanisms of antibiotic resistance development
+and cross-resistance in Pseudomonas aeruginosa strains isolated form patient
+samples.
+
+**Study design**:
+
+1. Eight strains of P. aeruginosa were isolated from patient samples. Strain
+   IDs: 083.2, 090.3, 095.3, 678.3, 804.2, 816.3
+2. Strains were passaged in either of the two antibiotics: ceftazidime
+   avibactam and meropenem.
+3. After 18 days of passageing, the evolved strains were collected. For each
+   strain, the parent strain, strain evolved in meropenem, and strain evolved
+   in ceftazidime avibactam (ID with P, M or C) were tested for resistance to
+   meropenem and ceftazidime (MIC, minimal inhibitory concentration, was
+   calculated for each strain in each drug).
+4. Each of the three versions of the six strains were profiled as follows:
+    1. Full genome sequencing to identify mutations
+    2. Transcriptomic analysis
+    3. Proteomic analysis
+
+The schematic diagram of the experimental setup
+![exp_setup](./Data/exp_setup.svg)
+
 ## Setup
 
 First, access the one of the login nodes on the cluster using ssh. 
@@ -40,10 +73,6 @@ Open <https://jupyterhub.embl.de> and select rstudio 4.4 environment from dropdo
 under Coding environment section. Then in rstudio click on File -> New Project
 -> Existing Directory and select scratch/OmicsPredocCourse/.
 
-When rstudio updates itself run the following:
-```{r}
-install.packages('renv')
-```
 We will need `tidyverse` for data manipulation, `tximport` to load the data,
 `DESeq2` to perform differential expression analysis and `here` package for
 easier file path managment. You can install these with:
@@ -56,6 +85,15 @@ renv::install("tidyverse")
 renv::install("tximport")
 renv::install("bioc::DESeq2")
 renv::install("here")
+```
+
+### Data
+
+The raw transcriptomics reads can be found on the cluster at
+`/scratch/omics_predoc_course/Data/Transcriptomics`. Use the following command
+to access this data from your folder:
+```
+ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPredocCourse/Data/Transcriptomics
 ```
 
 ## Running the transcriptomics pipeline
