@@ -32,7 +32,7 @@ samples.
     3. Proteomic analysis
 
 The schematic diagram of the experimental setup
-![exp_setup](./Data/exp_setup.svg)
+![exp_setup](./Data/exp_setup.svg =1000x200)
 
 ## Setup
 
