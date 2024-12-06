@@ -8,28 +8,34 @@ practical is based on.
 
 ## Background
 
-Collaboration with Dr. Baharak Babouee Flury, MD, Infectiologist from
+**Multi-omics practical with a focus on Bulk RNAseq: Investigating the
+mechanisms of antibiotic resistance in human pathogens with multi-omics
+approaches (genomics, transcriptomics, proteomics)**
+
+**Scenario**: you are a computational biologist who has set up a collaboration with
+a clinical scientist: Dr. Baharak Babouee Flury, MD, Infectiologist from
 Kantonsspital St. Gallen, Switzerland.
 
-**Goal**: Investigate potential mechanisms of antibiotic resistance development
-and cross-resistance in Pseudomonas aeruginosa strains isolated form patient
-samples.
+**Goal**: Your goal is to investigate potential mechanisms of antibiotic resistance
+development and cross-resistance in Pseudomonas aeruginosa strains isolated
+from patient samples. 
 
-**Study design**:
+**Data**: The collaborators performed experimental evolution of the isolated
+strains under exposure to two different antibiotics, measured antibiotic
+resistance levels of the different strains, and collected genomics,
+transcriptomics and proteomics measurements for the parent and the evolved
+strains. 
 
-1. Eight strains of P. aeruginosa were isolated from patient samples. Strain
-   IDs: 083.2, 090.3, 095.3, 678.3, 804.2, 816.3
-2. Strains were passaged in either of the two antibiotics: ceftazidime
-   avibactam and meropenem.
-3. After 18 days of passageing, the evolved strains were collected. For each
-   strain, the parent strain, strain evolved in meropenem, and strain evolved
-   in ceftazidime avibactam (ID with P, M or C) were tested for resistance to
-   meropenem and ceftazidime (MIC, minimal inhibitory concentration, was
-   calculated for each strain in each drug).
-4. Each of the three versions of the six strains were profiled as follows:
-    1. Full genome sequencing to identify mutations
-    2. Transcriptomic analysis
-    3. Proteomic analysis
+**Methods**: 
+
+**You will learn how to:**
+- Perform bulk RNAseq analysis (running on the EMBL cluster)
+- Manage your code and scripts (with git and SnakeMake pipelines)
+- Perform differential analysis of gene expression
+- Perform dimensionality reduction with Principal Component Analysis
+- Build simple machine learning models to predict antibiotic resistance based on gene expression profiles and identify genes associated with resistance
+- (optional) Perform differential analysis of a proteomics dataset
+- (optional) Investigate inconsistencies in the experimental data 
 
 The schematic diagram of the experimental setup
 ![exp_setup](./Data/exp_setup.png)

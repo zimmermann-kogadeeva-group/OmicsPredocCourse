@@ -188,6 +188,8 @@ ggplot(aes(x=num_strains, y=num_genes, fill=comparison)) +
     geom_bar(stat="identity", position="dodge", width=0.5)
 ```
 
+**Task:** determine which significantly up- or down-regulated genes are in 
+common between the most of the strains.
 
 ## PCA
 
