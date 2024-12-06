@@ -52,6 +52,13 @@ On the login node run the following to use the tools needed for this practical:
 ```
 module load git-lfs snakemake Miniforge3
 ```
+Then we make sure that conda settings are correct with:
+```
+conda config --remove channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+```
 Go to scratch and make your own folder with the following commands:
 ```
 mkdir -p /scratch/$USER/ &&
