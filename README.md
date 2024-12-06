@@ -96,7 +96,7 @@ setup the conda environment with the following three commands:
 ```
 module load Miniforge3 &&
 eval "$(conda shell.bash hook)" &&
-conda create -n omics_predoc_course -c bioconda -c conda-forge python==3.11 jupyterlab ipympl pandas requests scikit-learn seaborn matplotlib diskcache
+conda create -n omics_predoc_course --override-channels -c bioconda -c conda-forge python==3.11 jupyterlab ipympl pandas requests scikit-learn seaborn matplotlib diskcache
 ```
 
 Then register the new jupyter kernel with jupyterhub:

@@ -1,7 +1,11 @@
 import pandas as pd
 import requests
-from diskcache import Cache
 from time import sleep
+
+try:
+    from diskcache import Cache
+except ImportError as e:
+    Cache = None
 
 
 def correct_term_col(value):
@@ -25,10 +29,11 @@ def get_ora(
     if not isinstance(genes, str):
         genes = ",".join(genes)
 
-    cache = Cache(cache_path)
-    key = genes + str(organism) + annotDataSet + enrichmentTestType + correction
-    if cache.get(key) is not None:
-        return cache.get(key)
+    if Cache is not None:
+        cache = Cache(cache_path)
+        key = genes + str(organism) + annotDataSet + enrichmentTestType + correction
+        if cache.get(key) is not None:
+            return cache.get(key)
 
     # The default value for annotDataSet parameter means biological process GO terms
     query_params = {
@@ -54,7 +59,8 @@ def get_ora(
             term=lambda x: x.term.apply(correct_term_col)
         )
 
-        cache.set(key, df_res)
+        if Cache is not None:
+            cache.set(key, df_res)
 
         sleep(2)
 
