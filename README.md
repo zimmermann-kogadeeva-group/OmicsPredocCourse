@@ -89,8 +89,11 @@ tmux
 ```
 Within the tmux session, run the following three commands to start the pipeline:
 ```
-module load snakemake Miniforge3 &&
+module load snakemake Miniforge3 git-lfs &&
 cd ~/scratch/OmicsPredocCourse/ &&
+git lfs install && 
+git lfs fetch &&
+git lfs checkout &&
 snakemake --workflow-profile Profiles/Slurm all_salmon
 ```
 The pipeline will be discussed in [here](Notebooks/00_pipeline.md). But before
