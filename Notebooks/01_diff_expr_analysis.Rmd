@@ -98,17 +98,25 @@ df_norm %>% write_csv(here("Output/DESeq2/normalised_counts.csv"))
 dds %>% saveRDS(here("Output/DESeq2/dds.rds"))
 ```
 
-Finally, we get the log fold changes and p-values for each comparison:
+Finally, we get the log fold changes and p-values for one of the comparisons 
+for one of the strains using the results function from the `DESeq2` package:
 
 ```{r}
-df_lfc <- expand_grid(
+results(dds, c("group", "083.2_M", "083.2_P"))
+```
+
+and we can get all of the comparisons for all the strains as shown below:
+
+```{r}
+all_comparisons <- expand_grid(
     strain=selected_strains, 
     comparison=c("MvsP", "CvsP", "CvsM")
 ) %>% 
-# filter(!(strain == "090.3" & str_detect(comparison, "M"))) %>%
 rowwise() %>%
 mutate(both = list(c_across(everything()))) %>%
-pull(both) %>%
+pull(both)
+
+df_lfc <- all_comparisons %>%
 map(
     ~{
         results(dds, contrast=get_contrast(.x[[1]], .x[[2]])) %>%
@@ -173,11 +181,18 @@ Number of genes, that are significantly up- or down-regulated that are common
 between strains:
 
 ```{r}
-df_num_strains <- df_lfc %>% 
+
+```
+
+
+```{r}
+df_num_strains_per_gene <- df_lfc %>% 
 filter(padj < 0.05 & abs(log2fc) > 1) %>%
 group_by(comparison, gene_id) %>%
 summarise(num_strains=n_distinct(strain)) %>%
-ungroup() %>%
+ungroup()
+
+df_num_strains <- df_num_strains_per_gene %>% 
 group_by(num_strains, comparison) %>%
 summarise(num_genes=n_distinct(gene_id)) %>% 
 ungroup()
@@ -228,6 +243,7 @@ ggplot(mapping=aes(x=PC1, y=PC2)) +
 
 **Task**: 
 - try adding strain, condition or MIC information into the plot to see any clustering.
+- compare PCA of not normalised counts
 - what conclusions can you draw from all the plots in this notebook?
 
 The MIC table is loaded below:

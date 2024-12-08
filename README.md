@@ -47,22 +47,27 @@ MacOS/linux open terminal and on Windows open powershell or WSL and run
 ```
 ssh <your_embl_username>@login1.cluster.embl.de
 ```
+Alternatively, use
+[PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) with
+`<your_embl_username>@login1.cluster.embl.de` as the host name.
 
 On the login node run the following to use the tools needed for this practical:
 ```
-module load git-lfs snakemake Miniforge3
+module load git-lfs Miniforge3
 ```
-Then we make sure that conda settings are correct with:
+Then we make sure that conda and git settings are correct with:
 ```
 conda config --remove channels defaults
+conda config --remove channels r
 conda config --add channels bioconda
 conda config --add channels conda-forge
 conda config --set channel_priority strict
+git lfs install
 ```
 Go to scratch and make your own folder with the following commands:
 ```
-mkdir -p /scratch/$USER/ &&
-ln -s /scratch/$USER/ $HOME/scratch && 
+mkdir -p /scratch/$USER/
+ln -s /scratch/$USER/ $HOME/scratch 
 cd scratch
 ```
 Then clone the git repository:
@@ -72,7 +77,7 @@ git clone https://git.embl.de/grp-zimmermann-kogadeeva/OmicsPredocCourse.git
 
 The raw transcriptomics reads can be found on the cluster at
 `/scratch/omics_predoc_course/Data/Transcriptomics`. Use the following command
-to access this data from your folder:
+to be able to access this data from your folder:
 ```
 ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPredocCourse/Data/Transcriptomics
 ```
@@ -87,47 +92,55 @@ To make sure the pipeline is not interrupted by internet issues we will use
 ```
 tmux
 ```
-Within the tmux session, run the following three commands to start the pipeline:
+Within the tmux session, run the following four commands to start the pipeline:
 ```
-module load snakemake Miniforge3 git-lfs &&
-cd ~/scratch/OmicsPredocCourse/ &&
-git lfs install && 
-git lfs fetch &&
-git lfs checkout &&
-snakemake --workflow-profile Profiles/Slurm all_salmon
+module load snakemake Miniforge3
+eval "$(conda shell.bash hook)"
+cd ~/scratch/OmicsPredocCourse/
+snakemake --workflow-profile Profiles/Slurm
 ```
 The pipeline will be discussed in [here](Notebooks/00_pipeline.md). But before
 we move on there, let's setup up our conda and R environments for later.
 
 ### Conda setup
 
-Create a new tmux session by pressing `Ctrl+b c`. Then, in the new shell, we
-setup the conda environment with the following three commands:
+Create a new tmux window by pressing `Ctrl+b c`. We use tmux here to setup the
+conda environment in parallel with snakemake pipeline. Few useful keyboard
+shortcuts are:
+- create in window with `Ctrl+b c`
+- to switch between windows use `Ctrl+b n` or `Ctrl+b p`. 
+- to exit a session **without** closing (*.i.e.* detaching) use `Ctrl+b d`
+- to get back to a session type `tmux attach`
+
+Within the new tmux window, we setup the conda environment with the following
+three commands:
 ```
-module load Miniforge3 &&
-eval "$(conda shell.bash hook)" &&
-conda create -n omics_predoc_course --override-channels -c bioconda -c conda-forge python==3.11 jupyterlab ipympl pandas requests scikit-learn seaborn matplotlib diskcache
+module load Miniforge3
+eval "$(conda shell.bash hook)"
+conda create -n omics_predoc_course python==3.11 jupyterlab ipympl pandas requests scikit-learn seaborn matplotlib diskcache
 ```
 
 Then register the new jupyter kernel with jupyterhub:
 ```
-conda activate omcis_predoc_course &&
+conda activate omcis_predoc_course
 python3 -m ipykernel install --user --name "omics_predoc_course"
 ```
 
 ### R setup
 
-Open <https://jupyterhub.embl.de> and select rstudio 4.4 environment from dropdown menu
-under Coding environment section. Then in rstudio click on File -> New Project
--> Existing Directory and select scratch/OmicsPredocCourse/.
+1. Open <https://jupyterhub.embl.de>  
+2. Select **rstudio 4.4** environment from dropdown menu under **Coding environment** section
+3. In rstudio click on **File -> New Project -> Existing Directory** and select
+   **scratch/OmicsPredocCourse/**.
 
 We will need `tidyverse` for data manipulation, `tximport` to load the data,
 `DESeq2` to perform differential expression analysis and `here` package for
-easier file path managment. You can install these with:
+easier file path managment. You can install these with the following command,
+which uses the premade `renv.lock` file to install all the specified packages:
 ```{r}
 renv::restore()
 ```
-**or** like so:
+**Alternatively**, you can install these packages with:
 ```{r}
 renv::install("tidyverse")
 renv::install("tximport")
