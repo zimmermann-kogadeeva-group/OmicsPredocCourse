@@ -73,6 +73,7 @@ cd scratch
 Then clone the git repository:
 ```
 git clone https://git.embl.de/grp-zimmermann-kogadeeva/OmicsPredocCourse.git
+cd OmicsPredocCourse/
 ```
 
 The raw transcriptomics reads can be found on the cluster at
@@ -92,11 +93,10 @@ To make sure the pipeline is not interrupted by internet issues we will use
 ```
 tmux
 ```
-Within the tmux session, run the following four commands to start the pipeline:
+Within the tmux session, run the following three commands to start the pipeline:
 ```
 module load snakemake Miniforge3
 eval "$(conda shell.bash hook)"
-cd ~/scratch/OmicsPredocCourse/
 snakemake --workflow-profile Profiles/Slurm
 ```
 The pipeline will be discussed in [here](Notebooks/00_pipeline.md). But before
