@@ -107,7 +107,7 @@ we move on there, let's setup up our conda and R environments for later.
 Create a new tmux window by pressing `Ctrl+b c`. We use tmux here to setup the
 conda environment in parallel with snakemake pipeline. Few useful keyboard
 shortcuts are:
-- create in window with `Ctrl+b c`
+- create a window with `Ctrl+b c`
 - to switch between windows use `Ctrl+b n` or `Ctrl+b p`. 
 - to exit a session **without** closing (*.i.e.* detaching) use `Ctrl+b d`
 - to get back to a session type `tmux attach`
