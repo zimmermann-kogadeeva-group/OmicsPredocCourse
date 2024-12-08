@@ -180,9 +180,7 @@ ggplot(aes(x=strain, y=n, fill = regulation)) +
 Number of genes, that are significantly up- or down-regulated that are common 
 between strains:
 
-```{r}
 
-```
 
 
 ```{r}
@@ -239,6 +237,20 @@ ggplot(mapping=aes(x=PC1, y=PC2)) +
         x=paste0("PC1 (", var_expl["PC1"]*100, "%)"),
         y=paste0("PC2 (", var_expl["PC2"]*100, "%)")
     )
+```
+
+Loadings plot is shown below:
+
+```{r}
+pca$rotation %>% 
+as.data.frame() %>% 
+arrange(desc(abs(PC1)), desc(abs(PC2))) %>%
+slice_max(n=20, order_by = abs(PC1) + abs(PC2)) %>%
+rownames_to_column(var = "gene_id") %>%
+ggplot(aes(x=PC1, y=PC2, label=gene_id)) +
+    # geom_point() +
+    geom_text(nudge_x=0.01, nudge_y=0.01) + 
+    geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2), arrow=arrow(length=unit(0.2, "inches")))
 ```
 
 **Task**: 
