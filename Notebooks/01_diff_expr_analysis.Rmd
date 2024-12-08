@@ -256,6 +256,11 @@ mutate(
 )
 ```
 
-Please go to <https://jupyterhub.embl.de/hub/home>, click on "stop the server" and 
-reload the page to switch to "DataScience environment", in order to move on to 
-enrichment analysis in notebook [02_enrichment](02_enrichment.ipynb).
+## Next steps
+
+In order to move on to the next notebook *i.e.*
+[02_enrichment](02_enrichment.ipynb):
+1. Please go to <https://jupyterhub.embl.de/hub/home>
+2. Click on "stop the server"
+3. Reload the page to switch to "DataScience environment"
+
