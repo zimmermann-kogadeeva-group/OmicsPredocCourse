@@ -83,9 +83,11 @@ expression analysis using
 [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)[^3]
 in notebook [01_diff_expr_analysis](01_diff_expr_analysis.Rmd). 
 
-1. Please open rstudio on [jupyterhub](https://jupyterhub.embl.de) 
+1. Go to <https://jupyterhub.embl.de> and if rstudio does not show up, select
+   **rstudio 4.4** environment from dropdown menu under **Coding environment**
+   section
 2. Open **OmicsPredocCourse** project from recent projects 
-3. Open notebook **Notebooks/01_diff_expr_analysis.Rmd**
+3. Open notebook **Notebooks/01_diff_expr_analysis.Rmd** in bottom right panel
 
 [^1]: Bolger, A. M., Lohse, M., & Usadel, B. "Trimmomatic: A flexible trimmer for Illumina Sequence Data." (2014). Bioinformatics, btu170.
 
