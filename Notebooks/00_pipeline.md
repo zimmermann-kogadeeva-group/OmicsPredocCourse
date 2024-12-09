@@ -30,6 +30,32 @@ control of the raw transcriptomics data.
 [Fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 generates QC reports on a per sample bases and all of these are combined into a
 single report with the use of [multiqc](https://seqera.io/multiqc/).
+[Here](https://hbctraining.github.io/Intro-to-rnaseq-hpc-salmon/lessons/qc_fastqc_assessment.html)
+is a good resource on RNASeq QC.
+
+In the mutliqc report, there might be some yellow warnings or even red fails
+for some sample, but these should not be taken too seriously; they should be
+interpreted as samples for further investigation.
+
+Further within the mutliqc report, in the "General statistics" section, it is
+worth checking that all the numbers are as expected, such as the total number
+of sequences or GC content. The following section shows sequence counts, which
+shows us the number duplicated and unique reads. 
+
+One of the most important plots in the report is the mean quality scores, which
+give quality of the reads per base pair of the reads. With this plot we can
+catch various errors including ones from sequencing isues, such as
+overclustering of the flow cells or sequencer failure mid-run. Per sequence
+quality scores plot gives us an overview of sequence quality in all samples,
+where we do not want a peak at the low score end of the graph.
+
+Per sequence GC content will almost always fail for RNAseq data. Though, the
+distributions in this plot should look normally distributed. If the
+distributions in this plot do not look normally distributed, it could indicate
+either contamination or higly over-expressed gene.
+
+The rest of the plots look at over-represented or duplicated sequences, which
+can help us identify any contaminated sequences.
 
 ## Reads quantification
 
