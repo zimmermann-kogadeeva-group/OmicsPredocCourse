@@ -122,7 +122,7 @@ conda create -n omics_predoc_course python==3.11 jupyterlab ipympl pandas reques
 
 Then register the new jupyter kernel with jupyterhub:
 ```
-conda activate omcis_predoc_course
+conda activate omics_predoc_course
 python3 -m ipykernel install --user --name "omics_predoc_course"
 ```
 
