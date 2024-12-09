@@ -275,4 +275,5 @@ In order to move on to the next notebook *i.e.*
 1. Please go to <https://jupyterhub.embl.de/hub/home>
 2. Click on "stop the server"
 3. Reload the page to switch to "DataScience environment"
+4. Navigate to `scratch/OmicsPredocCourse/Notebooks/02_enrichment.ipynb`
 

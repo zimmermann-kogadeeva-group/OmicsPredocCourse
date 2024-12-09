@@ -1,18 +1,14 @@
 
 from pathlib import Path
 
-configfile: "config.json"
+samples, lanes, = glob_wildcards("Data/Transcriptomics/{sample}_L{lane}.fastq.gz")
 
 rule all:
     input:
         qc="Output/QC/multiqc_report.html",
         quants=expand(
-            "Output/Quants/{f}/quant.sf", f=config["transcriptomics"]
+            "Output/Quants/{f}/quant.sf", f=set(samples)
         )
-
-rule all_salmon:
-    input:
-        rules.all.input["quants"]
 
 rule fastqc:
     input:
@@ -28,8 +24,8 @@ rule multiqc:
     input:
         expand(
             "Output/QC/{f}_L{lane}_fastqc.html", 
-            f=config["transcriptomics"], 
-            lane=[1, 2]
+            f=set(samples), 
+            lane=set(lanes)
         )
     output:
         "Output/QC/multiqc_report.html",
@@ -91,4 +87,8 @@ rule salmon_quant:
         salmon = "-l A -p 1 --gcBias --validateMappings"
     shell:
         "salmon quant -i {input.index} {params.salmon} -r {input.reads} -o {params.outdir}"
+
+rule all_salmon:
+    input:
+        rules.all.input["quants"]
 
