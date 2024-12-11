@@ -137,9 +137,17 @@ df_lfc %>% write_csv(here("Output/DESeq2/dds_results.csv"))
 ## Plotting results
 
 ```{r}
-volcano_plot <- function(data, pval=0.05, lfcval=1, col="padj") {
-    ggplot(data=data, 
-           aes(x=log2fc, y=-log10(!!sym(col)), col=regulation, gene_id=gene_id)) +
+volcano_plot <- function(data, pval=0.05, lfcval=1, col="padj", ...) {
+    dots <- enquos(...)
+    
+    data %>%
+    ggplot(
+        aes(x=log2fc, 
+            y=-log10(!!sym(col)), 
+            col=regulation, 
+            gene_id=gene_id,
+            !!!dots
+        )) +
         geom_point(size=0.5) + 
         scale_color_manual(values=c("Up"="red", "Down"="blue", "None"="black")) +
         geom_hline(yintercept=-log10(pval), linetype='dashed', color="red") + 
@@ -147,14 +155,18 @@ volcano_plot <- function(data, pval=0.05, lfcval=1, col="padj") {
         geom_vline(xintercept=lfcval, linetype='dashed', color="red") %>%
     return()
 }
+
+df_ids <- read_csv(here("Data/id_mapping.csv"))
 ```
 
 Volcano plot for strain 083.2 comparing M treatment and parental strain:
 
 ```{r}
 df_lfc %>%
+left_join(df_ids, by="gene_id") %>%
 filter(strain == "083.2" & comparison == "MvsP") %>%
-volcano_plot()  # %>% plotly::ggplotly()
+volcano_plot(gene_name=gene_name, protein_name=protein_names) %>% 
+plotly::ggplotly()
 ```
 All volcano plots:
 
@@ -208,6 +220,7 @@ common between the most of the strains.
 
 ```{r}
 # Get variance stabilising transformation of counts
+
 df_vst <- dds %>% 
 vst() %>% 
 assay() %>% 
@@ -231,7 +244,7 @@ var_expl <- summary(pca)$importance[2, c(1, 2)]
 
 ```{r}
 df_pca %>%
-ggplot(mapping=aes(x=PC1, y=PC2)) + 
+ggplot(mapping=aes(x=PC1, y=PC2, colour=strain, shape = condition)) + 
     geom_point(size=2) + 
     labs(
         x=paste0("PC1 (", var_expl["PC1"]*100, "%)"),
@@ -247,11 +260,23 @@ as.data.frame() %>%
 arrange(desc(abs(PC1)), desc(abs(PC2))) %>%
 slice_max(n=20, order_by = abs(PC1) + abs(PC2)) %>%
 rownames_to_column(var = "gene_id") %>%
-ggplot(aes(x=PC1, y=PC2, label=gene_id)) +
+left_join(df_ids, by="gene_id") %>%
+ggplot(aes(x=PC1, y=PC2, label=gene_name)) +
     # geom_point() +
     geom_text(nudge_x=0.01, nudge_y=0.01) + 
     geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2), arrow=arrow(length=unit(0.2, "inches")))
 ```
+
+```{r}
+df_vst %>%
+pivot_longer(cols=!gene_id) %>%
+left_join(df_ids, by="gene_id") %>%
+filter(gene_name %in% c("pilY1", "pilW", "fpvA")) %>%
+tidyr::separate(name, into=c("strain", "condition", "replicate"), sep="_") %>%
+ggplot(aes(x=gene_name, y=value, colour = strain, shape=condition)) +
+    geom_jitter()
+```
+
 
 **Task**: 
 - try adding strain, condition or MIC information into the plot to see any clustering.
