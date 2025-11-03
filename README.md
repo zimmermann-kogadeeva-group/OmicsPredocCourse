@@ -40,6 +40,9 @@ strains.
 The schematic diagram of the experimental setup
 ![exp_setup](./Data/exp_setup.png)
 
+This mini-project is based on this publication: 
+<https://journals.asm.org/doi/full/10.1128/mbio.03896-24>
+
 ## Setup
 
 First, access the one of the login nodes on the cluster using ssh. On
