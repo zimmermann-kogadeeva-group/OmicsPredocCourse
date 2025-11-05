@@ -1,5 +1,5 @@
 
-# Omics predoc course 2024
+# Omics predoc course 2025
 
 Welcome to the omics practical! 
 
@@ -46,7 +46,8 @@ This mini-project is based on this publication:
 ## Setup
 
 First, access the one of the login nodes on the cluster using ssh. On
-MacOS/linux open terminal and on Windows open powershell or WSL and run 
+MacOS/linux open terminal and on Windows open command line (type `cmd` in the search field upon pressing the Start button) 
+or powershell or WSL and run 
 ```
 ssh <your_embl_username>@login1.cluster.embl.de
 ```
@@ -67,7 +68,8 @@ conda config --add channels conda-forge
 conda config --set channel_priority strict
 git lfs install
 ```
-Go to scratch and make your own folder with the following commands:
+Go to scratch and make your own folder (if you don't have one already). The following commands make a new directory (`mkdir`), 
+make a symbolic link to this directory called "scratch" in the home directory (`ln -s`) and change to the scratch directory (`cd`):
 ```
 mkdir -p /scratch/$USER/
 ln -s /scratch/$USER/ $HOME/scratch 
@@ -80,8 +82,8 @@ cd OmicsPredocCourse/
 ```
 
 The raw transcriptomics reads can be found on the cluster at
-`/scratch/omics_predoc_course/Data/Transcriptomics`. Use the following command
-to be able to access this data from your folder:
+`/scratch/omics_predoc_course/Data/Transcriptomics`. Use the following command (which makes a symbolic link to the data folder 
+in your current folder) to be able to access this data from your folder:
 ```
 ln -s /scratch/omics_predoc_course/Data/Transcriptomics/ /scratch/$USER/OmicsPredocCourse/Data/Transcriptomics
 ```
